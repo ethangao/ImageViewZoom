@@ -29,7 +29,7 @@ public class ImageViewTouch extends ImageViewTouchBase {
 	protected boolean mScrollEnabled = true;
 	private OnImageViewTouchDoubleTapListener mDoubleTapListener;
 	private OnImageViewTouchSingleTapListener mSingleTapListener;
-	
+
 	public ImageViewTouch ( Context context) {
 		super( context);
 	}
@@ -37,7 +37,7 @@ public class ImageViewTouch extends ImageViewTouchBase {
 	public ImageViewTouch ( Context context, AttributeSet attrs ) {
 		this( context, attrs, 0 );
 	}
-	
+
 	public ImageViewTouch ( Context context, AttributeSet attrs, int defStyle ) {
 		super( context, attrs, defStyle );
 	}
@@ -135,7 +135,7 @@ public class ImageViewTouch extends ImageViewTouchBase {
 			return 1f;
 		}
 	}
-	
+
 	public boolean onSingleTapConfirmed( MotionEvent e ) {
 		return true;
 	}
@@ -160,29 +160,29 @@ public class ImageViewTouch extends ImageViewTouchBase {
 		}
 		return false;
 	}
-	
+
 	public boolean onDown( MotionEvent e ) {
 		return true;
 	}
-	
+
 	public boolean onUp( MotionEvent e ) {
 		if ( getScale() < getMinScale() ) {
 			zoomTo( getMinScale(), 50 );
 		}
 		return true;
 	}
-	
+
 	public boolean onSingleTapUp( MotionEvent e ) {
 		return true;
 	}
 
 	/**
 	 * Determines whether this ImageViewTouch can be scrolled.
-	 * 
+	 *
 	 * @param direction
 	 *            - positive direction value means scroll from right to left,
 	 *            negative value means scroll from left to right
-	 * 
+	 *
 	 * @return true if there is some more place to scroll, false - otherwise.
 	 */
 	public boolean canScroll( int direction ) {
@@ -190,16 +190,27 @@ public class ImageViewTouch extends ImageViewTouchBase {
 		updateRect( bitmapRect, mScrollRect );
 		Rect imageViewRect = new Rect();
 		getGlobalVisibleRect( imageViewRect );
-		
+
 		if( null == bitmapRect ) {
 			return false;
 		}
 
-		if ( bitmapRect.right >= imageViewRect.right ) {
-			if ( direction < 0 ) {
-				return Math.abs( bitmapRect.right - imageViewRect.right ) > SCROLL_DELTA_THRESHOLD;
-			}
+		Log.d("dev-gaocx", direction + " " + imageViewRect.left + " " + bitmapRect.left + " " + mScrollRect.left
+		        + " " + imageViewRect.right + " " + bitmapRect.right + " " + mScrollRect.right);
+		// gaocx changed
+//		if ( bitmapRect.right >= imageViewRect.right ) {
+//			if ( direction < 0 ) {
+//				return Math.abs( bitmapRect.right - imageViewRect.right ) > SCROLL_DELTA_THRESHOLD;
+//			}
+//		}
+		if (direction < 0) {
+		    if ( bitmapRect.right >= imageViewRect.right ) {
+		        return Math.abs( bitmapRect.right - imageViewRect.right ) > SCROLL_DELTA_THRESHOLD;
+		    } else {
+		        return false;
+		    }
 		}
+		// change end
 
 		double bitmapScrollRectDelta = Math.abs( bitmapRect.left - mScrollRect.left );
 		return bitmapScrollRectDelta > SCROLL_DELTA_THRESHOLD;
@@ -249,14 +260,14 @@ public class ImageViewTouch extends ImageViewTouchBase {
 
 		@Override
 		public boolean onScroll( MotionEvent e1, MotionEvent e2, float distanceX, float distanceY ) {
-			
+
 			if ( !mScrollEnabled ) return false;
 			if ( e1 == null || e2 == null ) return false;
 			if ( e1.getPointerCount() > 1 || e2.getPointerCount() > 1 ) return false;
 			if ( mScaleDetector.isInProgress() ) return false;
 			return ImageViewTouch.this.onScroll( e1, e2, distanceX, distanceY );
 		}
-		
+
 		@Override
 		public boolean onFling( MotionEvent e1, MotionEvent e2, float velocityX, float velocityY ) {
 			if ( !mScrollEnabled ) return false;
@@ -267,29 +278,29 @@ public class ImageViewTouch extends ImageViewTouchBase {
 
 			return ImageViewTouch.this.onFling( e1, e2, velocityX, velocityY );
 		}
-		
+
 		@Override
 		public boolean onSingleTapUp( MotionEvent e ) {
 			return ImageViewTouch.this.onSingleTapUp( e );
 		}
-		
+
 		@Override
 		public boolean onDown( MotionEvent e ) {
 			return ImageViewTouch.this.onDown( e );
 		}
 	}
 
-	
-	
+
+
 	public class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-		
+
 		protected boolean mScaled = false;
 
 		@Override
 		public boolean onScale( ScaleGestureDetector detector ) {
 			float span = detector.getCurrentSpan() - detector.getPreviousSpan();
 			float targetScale = getScale() * detector.getScaleFactor();
-			
+
 			if ( mScaleEnabled ) {
 				if( mScaled && span != 0 ) {
 					mUserScaled = true;
@@ -299,14 +310,14 @@ public class ImageViewTouch extends ImageViewTouchBase {
 					invalidate();
 					return true;
 				}
-				
-				// This is to prevent a glitch the first time 
+
+				// This is to prevent a glitch the first time
 				// image is scaled.
 				if( !mScaled ) mScaled = true;
 			}
 			return true;
 		}
-		
+
 	}
 
 	public interface OnImageViewTouchDoubleTapListener {
